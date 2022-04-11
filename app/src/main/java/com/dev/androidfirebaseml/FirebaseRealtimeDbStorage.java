@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,8 +34,14 @@ public class FirebaseRealtimeDbStorage {
     StorageReference storageRef = FirebaseStorage.getInstance().getReference("images/" + reference);
 
     public void uploadDataToRealtimeDatabase(Item item) {
-        String key = dbRef.push().getKey();
-        assert key != null;
+        String key;
+        if(item.getId()!=null){
+             key = item.getId();
+        }else{
+             key = dbRef.push().getKey();
+        }
+//        String key = dbRef.push().getKey();
+        dbRef.child(key).child("imageUrl").setValue(item.getImageUrl());
         dbRef.child(key).child("filename").setValue(item.getFilename());
         dbRef.child(key).child("reader").setValue(item.getReader());
         dbRef.child(key).child("result").setValue(item.getResult());
@@ -44,24 +51,37 @@ public class FirebaseRealtimeDbStorage {
         dbRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String s) {
-                if (!snapshot.hasChildren() || snapshot.child("imageResource").getValue() == null)
-                    return;
                 Item item = new Item(
                         (String) snapshot.child("filename").getValue(),
                         (String) snapshot.child("reader").getValue(),
-                        (String) snapshot.child("result").getValue()
+                        (String) snapshot.child("result").getValue(),
+                        snapshot.getKey(),
+                        (String) snapshot.child("imageUrl").getValue()
                 );
-//                adapter.add(cbrEvent);
+                adapter.add(item);
+                System.out.println(">>>>>> " + item);
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+                adapter.notifyDataSetChanged();
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
 
+                System.out.println(">>>>id::: " + dataSnapshot.getKey());
+                System.out.println(">>>>filename::: " + dataSnapshot.child("filename").getValue());
+                Item item = new Item(
+                        (String) dataSnapshot.child("filename").getValue(),
+                        (String) dataSnapshot.child("reader").getValue(),
+                        (String) dataSnapshot.child("result").getValue(),
+                        dataSnapshot.getKey(),
+                        (String) dataSnapshot.child("imageUrl").getValue()
+                );
+                System.out.println("position:::: "+adapter.getPosition(item));
+                adapter.remove(item);
+                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -77,70 +97,47 @@ public class FirebaseRealtimeDbStorage {
     }
 
     // UploadImage method
-    private void uploadImage(Context context, Uri filePath) {
+    public void uploadImage(Context context, Uri filePath, String filename, Item item) {
         if (filePath != null) {
 
-            // Code for showing progressDialog while uploading
-            ProgressDialog progressDialog
-                    = new ProgressDialog(context);
-            progressDialog.setTitle("Uploading...");
-            progressDialog.show();
+            StorageReference ref = storageRef.child(filename);
 
-            // Defining the child of storageReference
-            String date = new SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance().getTime());
-            Date dateTime = new Date();
-            long timeMilli = dateTime.getTime();
-            StorageReference ref
-                    = storageRef
-                    .child(date + timeMilli);
+            ref.putFile(filePath).addOnSuccessListener(
+                    new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            if (taskSnapshot.getMetadata() != null) {
+                                if (taskSnapshot.getMetadata().getReference() != null) {
+                                    Task<Uri> result = taskSnapshot.getStorage().getDownloadUrl();
+                                    result.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+                                            String imageUrl = uri.toString();
+                                            item.setImageUrl(imageUrl);
+                                            uploadDataToRealtimeDatabase(item);
+                                            Toast.makeText(context, "Data Save successfully ", Toast.LENGTH_SHORT).show();
 
-            // adding listeners on upload
-            // or failure of image
-            ref.putFile(filePath)
-                    .addOnSuccessListener(
-                            new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(
-                                        UploadTask.TaskSnapshot taskSnapshot) {
-
-                                    // Image uploaded successfully
-                                    // Dismiss dialog
-                                    progressDialog.dismiss();
-                                    Toast
-                                            .makeText(context,
-                                                    "Image Uploaded!!",
-                                                    Toast.LENGTH_SHORT)
-                                            .show();
+                                        }
+                                    });
                                 }
-                            })
+                            }
+
+
+                        }
+                    })
 
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
 
-                            // Error, Image not uploaded
-                            progressDialog.dismiss();
-                            Toast
-                                    .makeText(context,
-                                            "Failed " + e.getMessage(),
-                                            Toast.LENGTH_SHORT)
-                                    .show();
+                            Toast.makeText(context, "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     })
                     .addOnProgressListener(
                             new OnProgressListener<UploadTask.TaskSnapshot>() {
-                                // Progress Listener for loading
-                                // percentage on the dialog box
                                 @Override
-                                public void onProgress(
-                                        UploadTask.TaskSnapshot taskSnapshot) {
-                                    double progress
-                                            = (100.0
-                                            * taskSnapshot.getBytesTransferred()
-                                            / taskSnapshot.getTotalByteCount());
-                                    progressDialog.setMessage(
-                                            "Uploaded "
-                                                    + (int) progress + "%");
+                                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+
                                 }
                             });
         }

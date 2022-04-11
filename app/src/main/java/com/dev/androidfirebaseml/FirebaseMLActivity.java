@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,10 +28,13 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.label.FirebaseVisionImageLabel;
 import com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler;
+import com.google.firebase.storage.StorageReference;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
@@ -47,6 +51,9 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class FirebaseMLActivity extends AppCompatActivity {
@@ -74,6 +81,16 @@ public class FirebaseMLActivity extends AppCompatActivity {
         editResult = findViewById(R.id.editResultBtn);
         loadingImageBtn = findViewById(R.id.deleteBtn);
 
+        editResult.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), EditContentActivity.class);
+                intent.putExtra("title", tvTitle.getText().toString());
+                intent.putExtra("fileUri", imageFileUri.toString());
+                intent.putExtra("resultText", tvResult.getText().toString());
+                startActivity(intent);
+            }
+        });
         if (type == 0) {
             imageView.setImageDrawable(getResources().getDrawable(R.drawable.barcode));
         } else if (type == 1) {
@@ -207,7 +224,7 @@ public class FirebaseMLActivity extends AppCompatActivity {
                         result1 = barcode.getRawValue();
                         tvResult.append("  " + result1 + "\n");
                     }
-                    uploadData();
+//                    uploadData();
 
                     if (result1 == null) {
                         tvResult.append("  No barcode found\n");
@@ -221,11 +238,20 @@ public class FirebaseMLActivity extends AppCompatActivity {
                 });
     }
 
-    void uploadData() {
-        String filename = new File(imageFileUri.getPath()).getName();
-        Item item = new Item(filename, tvTitle.getText().toString(), tvResult.getText().toString());
-        db.uploadDataToRealtimeDatabase(item);
-    }
+//    void uploadData() {
+//
+//        String date = new SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance().getTime());
+//        Date dateTime = new Date();
+//        long timeMilli = dateTime.getTime();
+//        //        StorageReference ref
+////                = storageRef
+////                .child(date + timeMilli);
+//        db.uploadImage(getApplicationContext(), imageFileUri, date + timeMilli);
+//
+////        String filename = new File(imageFileUri.getPath()).getName();
+//        Item item = new Item(date + timeMilli, tvTitle.getText().toString(), tvResult.getText().toString());
+//        db.uploadDataToRealtimeDatabase(item);
+//    }
 
     public void runContentReader(Uri uri) {
         FirebaseVisionImage image;
@@ -240,7 +266,7 @@ public class FirebaseMLActivity extends AppCompatActivity {
                     float confidence = label.getConfidence();
                     tvResult.append(text + "  " + confidence + "\n");
                 }
-                uploadData();
+//                uploadData();
 
             }).addOnFailureListener(e -> tvResult.setText("No data found\n"));
         } catch (IOException e) {
@@ -260,7 +286,7 @@ public class FirebaseMLActivity extends AppCompatActivity {
                                 String result = visionText.getText();
                                 if (result.length() > 0) {
                                     tvResult.append("Detected text:\n  " + result + "\n");
-                                    uploadData();
+//                                    uploadData();
                                 } else {
                                     tvResult.append("Detected text:\n  No text found.\n");
                                 }
@@ -279,26 +305,26 @@ public class FirebaseMLActivity extends AppCompatActivity {
     }
 
 
-    public void runImageContentReader(InputImage image) {
-        ImageLabeler labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS);
-
-        labeler.process(image)
-                .addOnSuccessListener(
-                        new OnSuccessListener<List<ImageLabel>>() {
-                            @Override
-                            public void onSuccess(List<ImageLabel> labels) {
-                                for (ImageLabel label : labels) {
-
-                                    String result = label.getText();
-
-                                }
-                            }
-                        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        tvResult.setText("Failed");
-                    }
-                });
-    }
+//    public void runImageContentReader(InputImage image) {
+//        ImageLabeler labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS);
+//
+//        labeler.process(image)
+//                .addOnSuccessListener(
+//                        new OnSuccessListener<List<ImageLabel>>() {
+//                            @Override
+//                            public void onSuccess(List<ImageLabel> labels) {
+//                                for (ImageLabel label : labels) {
+//
+//                                    String result = label.getText();
+//
+//                                }
+//                            }
+//                        })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        tvResult.setText("Failed");
+//                    }
+//                });
+//    }
 }

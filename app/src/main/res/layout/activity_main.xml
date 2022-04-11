@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="10dp"
     tools:context=".MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -40,7 +41,7 @@
             android:id="@+id/barCodeImageView"
             android:layout_width="300dp"
             android:layout_height="100dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="20dp"
             android:src="@drawable/barcode"
             app:layout_constraintBottom_toTopOf="@+id/imageContentText"
             app:layout_constraintEnd_toEndOf="parent"
@@ -51,7 +52,6 @@
             android:id="@+id/imageContentText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
             android:textSize="18sp"
             android:text="Image Content Reader"
             app:layout_constraintBottom_toTopOf="@+id/contentImageView"
@@ -63,7 +63,7 @@
             android:id="@+id/contentImageView"
             android:layout_width="264dp"
             android:layout_height="169dp"
-            android:layout_marginBottom="28dp"
+            android:layout_marginBottom="20dp"
             android:src="@drawable/content"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toTopOf="@+id/textView4"
@@ -88,12 +88,12 @@
             android:layout_height="100dp"
             android:layout_marginBottom="20dp"
             android:src="@drawable/text"
-            app:layout_constraintBottom_toTopOf="@+id/button"
+            app:layout_constraintBottom_toTopOf="@+id/btnListView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/btnListView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
