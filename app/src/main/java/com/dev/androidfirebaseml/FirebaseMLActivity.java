@@ -45,6 +45,7 @@ import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -55,6 +56,7 @@ public class FirebaseMLActivity extends AppCompatActivity {
     private static final int REQUEST_PERMISSION = 3000;
     private Uri imageFileUri;
     private int type;
+    private FirebaseRealtimeDbStorage db = new FirebaseRealtimeDbStorage();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +70,9 @@ public class FirebaseMLActivity extends AppCompatActivity {
         Intent intent = getIntent();
         type = intent.getIntExtra("type", 0);
 
-        openCameraBtn = findViewById(R.id.openCameraBtn);
+        openCameraBtn = findViewById(R.id.editBtn);
         editResult = findViewById(R.id.editResultBtn);
-        loadingImageBtn = findViewById(R.id.loadImageBtn);
+        loadingImageBtn = findViewById(R.id.deleteBtn);
 
         if (type == 0) {
             imageView.setImageDrawable(getResources().getDrawable(R.drawable.barcode));
@@ -119,8 +121,8 @@ public class FirebaseMLActivity extends AppCompatActivity {
 
 
     public void openCamera() {
-//        if (!checkPermissions())
-//            return;
+        if (!checkPermissions())
+            return;
         Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         imageFileUri = getContentResolver()
                 .insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues());
@@ -183,7 +185,7 @@ public class FirebaseMLActivity extends AppCompatActivity {
                                 tvTitle.setText("Detected text");
                                 runTextReader(image);
                             }
-
+                            editResult.setVisibility(View.VISIBLE);
                         }
                     }
                 }
@@ -205,6 +207,8 @@ public class FirebaseMLActivity extends AppCompatActivity {
                         result1 = barcode.getRawValue();
                         tvResult.append("  " + result1 + "\n");
                     }
+                    uploadData();
+
                     if (result1 == null) {
                         tvResult.append("  No barcode found\n");
                     }
@@ -215,6 +219,12 @@ public class FirebaseMLActivity extends AppCompatActivity {
                         tvResult.setText("Failed");
                     }
                 });
+    }
+
+    void uploadData() {
+        String filename = new File(imageFileUri.getPath()).getName();
+        Item item = new Item(filename, tvTitle.getText().toString(), tvResult.getText().toString());
+        db.uploadDataToRealtimeDatabase(item);
     }
 
     public void runContentReader(Uri uri) {
@@ -230,6 +240,8 @@ public class FirebaseMLActivity extends AppCompatActivity {
                     float confidence = label.getConfidence();
                     tvResult.append(text + "  " + confidence + "\n");
                 }
+                uploadData();
+
             }).addOnFailureListener(e -> tvResult.setText("No data found\n"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -246,9 +258,10 @@ public class FirebaseMLActivity extends AppCompatActivity {
                             public void onSuccess(Text visionText) {
                                 // Task completed successfully
                                 String result = visionText.getText();
-                                if (result.length() > 0)
+                                if (result.length() > 0) {
                                     tvResult.append("Detected text:\n  " + result + "\n");
-                                else {
+                                    uploadData();
+                                } else {
                                     tvResult.append("Detected text:\n  No text found.\n");
                                 }
                             }
