@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 
 public class SelectedAnalysedImageActivity extends AppCompatActivity {
     private TextView tvTitle;
@@ -45,6 +46,8 @@ public class SelectedAnalysedImageActivity extends AppCompatActivity {
 
         editText.setText(result);
         tvTitle.setText(title);
+        System.out.println("fileUri >>>>>>"+fileUri);
+        Picasso.get().load(fileUri).into(imageView);
 //        imageView.setImageURI(fileUri);
         btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,7 +55,7 @@ public class SelectedAnalysedImageActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), EditContentActivity.class);
                 intent.putExtra("title", tvTitle.getText().toString());
                 intent.putExtra("filename", filename);
-                intent.putExtra("fileUri", fileUri);
+                intent.putExtra("imageUrl", fileUri);
                 intent.putExtra("resultText", editText.getText().toString());
                 intent.putExtra("id", id);
                 startActivity(intent);

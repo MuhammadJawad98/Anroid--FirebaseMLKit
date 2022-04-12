@@ -49,7 +49,7 @@ public class ListViewActivity extends AppCompatActivity {
                         intent.putExtra("filename", item.getFilename());
                         intent.putExtra("result", item.getResult());
                         intent.putExtra("id", item.getId());
-                        intent.putExtra("filename", item.getFilename());
+                        intent.putExtra("fileUri", item.getImageUrl());
                         ListViewActivity.this.startActivity(intent);
                     }
                 });
