@@ -93,10 +93,13 @@ public class FirebaseMLActivity extends AppCompatActivity {
         });
         if (type == 0) {
             imageView.setImageDrawable(getResources().getDrawable(R.drawable.barcode));
+            getSupportActionBar().setTitle("Barcode Reader");
         } else if (type == 1) {
             imageView.setImageDrawable(getResources().getDrawable(R.drawable.content));
+            getSupportActionBar().setTitle("Image Content Reader");
         } else {
             imageView.setImageDrawable(getResources().getDrawable(R.drawable.text));
+            getSupportActionBar().setTitle("Text Reader");
         }
 
         openCameraBtn.setOnClickListener(new View.OnClickListener() {
@@ -238,7 +241,7 @@ public class FirebaseMLActivity extends AppCompatActivity {
                 });
     }
 
-//    void uploadData() {
+    //    void uploadData() {
 //
 //        String date = new SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance().getTime());
 //        Date dateTime = new Date();
@@ -252,6 +255,10 @@ public class FirebaseMLActivity extends AppCompatActivity {
 //        Item item = new Item(date + timeMilli, tvTitle.getText().toString(), tvResult.getText().toString());
 //        db.uploadDataToRealtimeDatabase(item);
 //    }
+//accept a param to determine the numbers of decimal digits
+    public static String toPercentage(float n, int digits) {
+        return String.format("%." + digits + "f", n * 100) + "%";
+    }
 
     public void runContentReader(Uri uri) {
         FirebaseVisionImage image;
@@ -260,11 +267,13 @@ public class FirebaseMLActivity extends AppCompatActivity {
             FirebaseVisionImageLabeler labeler = FirebaseVision.getInstance()
                     .getOnDeviceImageLabeler();
             labeler.processImage(image).addOnSuccessListener(labels -> {
+                int i = 1;
                 for (FirebaseVisionImageLabel label : labels) {
                     String text = label.getText();
                     String entityId = label.getEntityId();
                     float confidence = label.getConfidence();
-                    tvResult.append(text + "  " + confidence + "\n");
+                    tvResult.append(i + ": " + text + "  " + toPercentage(confidence,2) + "\n");
+                    i++;
                 }
 //                uploadData();
 

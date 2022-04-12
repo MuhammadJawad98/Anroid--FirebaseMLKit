@@ -18,7 +18,7 @@ import java.util.Date;
 
 public class EditContentActivity extends AppCompatActivity {
     private FirebaseRealtimeDbStorage db = new FirebaseRealtimeDbStorage();
-    private TextView tvTitle;
+    private EditText tvTitle;
     private EditText editText;
     private ImageView imageView;
     private Button btnSave;
@@ -53,7 +53,7 @@ public class EditContentActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (id != null) {
-                    Item item = new Item(filename, title, result, id, uri);
+                    Item item = new Item(filename, tvTitle.getText().toString(), editText.getText().toString(), id, uri);
                     db.uploadDataToRealtimeDatabase(item);
                     Toast.makeText(getApplicationContext(), "Data Update successfully", Toast.LENGTH_SHORT).show();
                 } else {
