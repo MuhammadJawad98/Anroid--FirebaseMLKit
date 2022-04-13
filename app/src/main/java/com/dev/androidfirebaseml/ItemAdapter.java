@@ -43,24 +43,12 @@ public class ItemAdapter extends ArrayAdapter<Item> {
 
         ImageView icon = (ImageView) convertView.findViewById(R.id.imageViewIcon);
         Picasso.get().load(event.getImageUrl()).into(icon);
-//        icon.setImageResource(event.getImageUrl());
-//        URL newurl = null;
-//        try {
-//            newurl = new URL(event.getImageUrl());
-//            Bitmap mIcon_val = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
-//            icon.setImageBitmap(mIcon_val);
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+
 
 
         TextView textViewTitle = (TextView) convertView.findViewById(R.id.textViewTitle);
-        textViewTitle.setText(event.getFilename());
+        textViewTitle.setText(event.getReader());
 
-//        TextView textViewDates = (TextView) convertView.findViewById(R.id.textViewDates);
-//        textViewDates.setText(event.getDates());
 
         return convertView;
     }
