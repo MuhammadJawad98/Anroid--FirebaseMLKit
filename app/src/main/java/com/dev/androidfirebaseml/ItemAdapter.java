@@ -11,6 +11,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -40,6 +42,7 @@ public class ItemAdapter extends ArrayAdapter<Item> {
         Item event = events.get(position);
 
         ImageView icon = (ImageView) convertView.findViewById(R.id.imageViewIcon);
+        Picasso.get().load(event.getImageUrl()).into(icon);
 //        icon.setImageResource(event.getImageUrl());
 //        URL newurl = null;
 //        try {

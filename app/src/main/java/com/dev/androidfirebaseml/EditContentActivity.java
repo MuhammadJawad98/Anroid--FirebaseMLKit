@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,6 +36,7 @@ public class EditContentActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String title = intent.getStringExtra("title");
         String uri = intent.getStringExtra("fileUri");
+        String imageUrl = intent.getStringExtra("imageUrl");
         id = intent.getStringExtra("id");
 
         String result = intent.getStringExtra("resultText");
@@ -48,6 +51,8 @@ public class EditContentActivity extends AppCompatActivity {
         if (uri != null) {
             fileUri = Uri.parse(uri);
             imageView.setImageURI(fileUri);
+        }else{
+            Picasso.get().load(imageUrl).into(imageView);
         }
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override

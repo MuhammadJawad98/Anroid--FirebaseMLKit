@@ -227,7 +227,6 @@ public class FirebaseMLActivity extends AppCompatActivity {
                         result1 = barcode.getRawValue();
                         tvResult.append("  " + result1 + "\n");
                     }
-//                    uploadData();
 
                     if (result1 == null) {
                         tvResult.append("  No barcode found\n");
@@ -241,21 +240,6 @@ public class FirebaseMLActivity extends AppCompatActivity {
                 });
     }
 
-    //    void uploadData() {
-//
-//        String date = new SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance().getTime());
-//        Date dateTime = new Date();
-//        long timeMilli = dateTime.getTime();
-//        //        StorageReference ref
-////                = storageRef
-////                .child(date + timeMilli);
-//        db.uploadImage(getApplicationContext(), imageFileUri, date + timeMilli);
-//
-////        String filename = new File(imageFileUri.getPath()).getName();
-//        Item item = new Item(date + timeMilli, tvTitle.getText().toString(), tvResult.getText().toString());
-//        db.uploadDataToRealtimeDatabase(item);
-//    }
-//accept a param to determine the numbers of decimal digits
     public static String toPercentage(float n, int digits) {
         return String.format("%." + digits + "f", n * 100) + "%";
     }
@@ -270,12 +254,11 @@ public class FirebaseMLActivity extends AppCompatActivity {
                 int i = 1;
                 for (FirebaseVisionImageLabel label : labels) {
                     String text = label.getText();
-                    String entityId = label.getEntityId();
+//                    String entityId = label.getEntityId();
                     float confidence = label.getConfidence();
-                    tvResult.append(i + ": " + text + "  " + toPercentage(confidence,2) + "\n");
+                    tvResult.append(i + ": " + text + "  (" + toPercentage(confidence, 2) + " confidence)" + "\n");
                     i++;
                 }
-//                uploadData();
 
             }).addOnFailureListener(e -> tvResult.setText("No data found\n"));
         } catch (IOException e) {
@@ -295,7 +278,6 @@ public class FirebaseMLActivity extends AppCompatActivity {
                                 String result = visionText.getText();
                                 if (result.length() > 0) {
                                     tvResult.append("Detected text:\n  " + result + "\n");
-//                                    uploadData();
                                 } else {
                                     tvResult.append("Detected text:\n  No text found.\n");
                                 }
@@ -314,26 +296,4 @@ public class FirebaseMLActivity extends AppCompatActivity {
     }
 
 
-//    public void runImageContentReader(InputImage image) {
-//        ImageLabeler labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS);
-//
-//        labeler.process(image)
-//                .addOnSuccessListener(
-//                        new OnSuccessListener<List<ImageLabel>>() {
-//                            @Override
-//                            public void onSuccess(List<ImageLabel> labels) {
-//                                for (ImageLabel label : labels) {
-//
-//                                    String result = label.getText();
-//
-//                                }
-//                            }
-//                        })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        tvResult.setText("Failed");
-//                    }
-//                });
-//    }
 }
