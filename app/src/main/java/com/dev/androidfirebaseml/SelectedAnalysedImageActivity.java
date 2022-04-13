@@ -18,7 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class SelectedAnalysedImageActivity extends AppCompatActivity {
     private TextView tvTitle;
-    private EditText editText;
+    private TextView editText;
     private ImageView imageView;
     private Button btnEdit, btnDelete, btnCancel;
     DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("analysed_images");
